@@ -1,16 +1,27 @@
 #!/usr/bin/python3
-"""Script to export data in the CSV format"""
+"""Script to return info about todo list progress"""
+import requests
 from requests import get
 from sys import argv
-import csv
 
 
-def information_employee(id_employee):
+def information_employee():
     """Returns information about employees"""
+    id_employee = int(argv[1])
+    id_employee = int(argv[1])
     employee_name = ""
-    task_data = []
+    number_of_done_task = 0
+    total_number_of_task = 0
+    task_title = []
 
     url_users = 'https://jsonplaceholder.typicode.com/users'
+
+    # Get user data
+    user_url = f"https://jsonplaceholder.typicode.com/users/{id_employee}"
+    user_response = requests.get(user_url)
+    user_data = user_response.json()
+    employee_name = user_data['name']
+
     url_todos = 'https://jsonplaceholder.typicode.com/todos'
 
     response_one = get(url_users)
@@ -21,34 +32,22 @@ def information_employee(id_employee):
         response_json_tod = response_two.json()
 
         for user in response_json_usr:
-            if user['id'] == id_employee:
-                employee_name = user['username']
+            if (user['id'] == id_employee):
+                employee_name = user['name']
 
                 for tod in response_json_tod:
                     if tod['userId'] == id_employee:
-                        task_data.append(tod)
+                        total_number_of_task += 1
+                        if tod['completed'] is True:
+                            number_of_done_task += 1
+                            task_title.append(tod['title'])
 
-        # Call the function to export data to CSV
-        export_to_csv(id_employee, employee_name, task_data)
-
-
-def export_to_csv(user_id, employee_name, task_data):
-    """Exports the employee information to a CSV file"""
-    filename = f"{user_id}.csv"
-
-    with open(filename, mode='w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile, delimiter=',',
-                                quotechar='"', quoting=csv.QUOTE_ALL)
-
-        for task in task_data:
-            csv_writer.writerow(
-                [user_id, employee_name, task['completed'], task['title']])
+        print('Employee {} is done with tasks({}/{}):'
+              .format(employee_name, number_of_done_task,
+                      total_number_of_task))
+        for title in task_title:
+            print('\t {}'.format(title))
 
 
 if __name__ == "__main__":
-    if len(argv) != 2:
-        print("Usage: python script.py <employee_id>")
-        exit(1)
-
-    employee_id = int(argv[1])
-    information_employee(employee_id)
+    information_employee()
