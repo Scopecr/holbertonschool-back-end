@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Script to export data to CSV"""
+"""Script to export data in the CSV format"""
 from requests import get
 from sys import argv
 import csv
@@ -10,8 +10,8 @@ def information_employee(id_employee):
     employee_name = ""
     task_data = []
 
-    url_users = 'http://jsonplaceholder.typicode.com/users'
-    url_todos = 'http://jsonplaceholder.typicode.com/todos'
+    url_users = 'https://jsonplaceholder.typicode.com/users'
+    url_todos = 'https://jsonplaceholder.typicode.com/todos'
 
     response_one = get(url_users)
     response_two = get(url_todos)
@@ -21,19 +21,19 @@ def information_employee(id_employee):
         response_json_tod = response_two.json()
 
         for user in response_json_usr:
-            if user.get['id'] == id_employee:
-                employee_name = user.get['username']
+            if user['id'] == id_employee:
+                employee_name = user['username']
 
                 for tod in response_json_tod:
                     if tod['userId'] == id_employee:
                         task_data.append(tod)
 
-                'Call function to export data to CSV'
-                export_to_csv(employee_name, task_data)
+        # Call the function to export data to CSV
+        export_to_csv(id_employee, employee_name, task_data)
 
 
-def export_to_csv(employee_name, task_data):
-    """Exports the employee information to csv file"""
+def export_to_csv(user_id, employee_name, task_data):
+    """Exports the employee information to a CSV file"""
     filename = f"{user_id}.csv"
 
     with open(filename, mode='w', newline='') as csvfile:
