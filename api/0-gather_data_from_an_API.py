@@ -1,4 +1,4 @@
-#!/ur/bin/python3
+#!/usr/bin/python3
 """
 data gathering from api module
 """
