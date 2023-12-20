@@ -9,29 +9,29 @@ def information_employee(id_employee):
     """Returns information about employees"""
     employee_name = ""
     task_data = []
-    
+
     url_users = 'http://jsonplaceholder.typicode.com/users'
     url_todos = 'http://jsonplaceholder.typicode.com/todos'
-    
+
     response_one = get(url_users)
     response_two = get(url_todos)
-    
+
     if response_one.status_code == 200:
         response_json_usr = response_one.json()
         response_json_tod = response_two.json()
-        
+
         for user in response_json_usr:
             if user.get['id'] == id_employee:
                 employee_name = user.get['username']
-                
+
                 for tod in response_json_tod:
                     if tod['userId'] == id_employee:
                         task_data.append(tod)
-                
+
                 'Call function to export data to CSV'
                 export_to_csv(employee_name, task_data)
-                
-        
+
+
 def export_to_csv(employee_name, task_data):
     """Exports the employee information to csv file"""
     filename = f"{user_id}.csv"
