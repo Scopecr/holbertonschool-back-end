@@ -1,41 +1,44 @@
 #!/usr/bin/python3
 """
-This module uses Python to make requests to a REST API.
-q
-It fetches data about a specific employee's tasks
-and prints a summary of the tasks completed and the
-titles of the completed tasks.
+    data gathering from api module
 """
-import json
 import requests
+import sys
 
 
-# Reuet data for users
-users = requests.get('https://jsonplaceholder.typicode.com/users').json()
+employee_id = sys.argv[1]
 
-# Make an empty dictionary
-all_tasks = {}
 
-# Loop over all users
-for user in users:
-    # get the user id and name
-    user_id = user['id']
-    user_name = user['username']
+user_response = requests.get(
+    'https://jsonplaceholder.typicode.com/users/' + employee_id)
 
-    # Get the list
-    todo_list = requests.get(
-        f'https://jsonplaceholder.typicode.com/todos?userId={user_id}').json()
 
-    # Format the task as indicated
-    task_list = [{'username': user_name, 'task': task.get(
-        'title'), 'completed': task.get('completed')} for task in todo_list]
+data = user_response.json()
 
-    # Adds the task to the dictionary
-    all_tasks[user_id] = task_list
 
-# Export using Json format
-with open('todo_all_employees.json', 'w') as jsonfile:
-    json.dump(all_tasks, jsonfile)
+employee_name = data['name']
+
+
+todo_response = requests.get(
+    'https://jsonplaceholder.typicode.com/todos?userId=' + employee_id)
+
+
+todo_data = todo_response.json()
+
+
+todo_total = str(len(todo_data))
+
+
+todo_completed = str(sum(1 for task in todo_data if task['completed']))
+
+
+print('Employee {} is done with tasks({}/{}):'.format(employee_name,
+      todo_completed, todo_total))
+
+
+for task in todo_data:
+    if task['completed']:
+        print('\t {}'.format(task['title']))
 
 if __name__ == '__main__':
     pass
